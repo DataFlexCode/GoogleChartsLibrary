@@ -1,0 +1,79 @@
+Use cWebBaseControl.pkg
+Use cJsonObject.pkg  // Just to get the types
+
+Define C_chartTypePie  for "PieChart"
+Define C_chartTypeBar  for "BarChart"
+Define C_chartTypeArea for "AreaChart"
+Define C_chartTypeScat for "ScatterChart"
+Define C_chartTypeLine for "LineChart"
+Define C_chartTypeCol  for "ColumnChart"
+// etc...
+
+Class cWebChart is a cWebBaseControl
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        
+        { WebProperty=Client }
+        Property String  psTitle
+        { WebProperty=Client }
+        Property Integer piChartHeight
+        { WebProperty=Client }
+        Property Integer piChartWidth
+        { WebProperty=Client }
+        Property String  psChartType
+        
+        Set psJSClass to "gCharts.chart"
+        
+        Set pbShowLabel to False
+    End_Procedure
+    
+    Procedure Initalize
+        Send ClientAction "initalize"
+    End_Procedure
+    
+    Procedure AddColumn Integer iType String sLabel String sID String sRole String sPattern 
+        String[] asParams
+        String   sType
+        
+        Case Begin
+            Case (iType = jsonTypeString)
+                Move "string"   to sType
+                Case Break
+            Case (iType = jsonTypeInteger)
+                Move "number"   to sType
+                Case Break
+            Case (iType = jsonTypeDouble)
+                Move "number"   to sType
+                Case Break
+            Case (iType = jsonTypeBoolean)
+                Move "boolean"  to sType
+                Case Break
+            Case Else
+                Move "string" to sType
+        Case End
+        
+        Move sType      to asParams[0]
+        Move sLabel     to asParams[1]
+        Move sID        to asParams[2]
+        Move sRole      to asParams[3]
+        Move sPattern   to asParams[4]
+        Send ClientAction "addColumn" asParams
+    End_Procedure
+    
+    Procedure AddData
+        String[] asParams
+        Integer  i iArg
+                
+        For iArg from 1 to num_arguments
+            Move iArg& to asParams[iArg - 1]
+        Loop
+        
+        Send ClientAction "addData" asParams
+    End_Procedure
+    
+    Procedure DrawChart
+        Send ClientAction "drawChart"
+    End_Procedure
+
+End_Class
